@@ -40,7 +40,12 @@ def kmeans(features, k, num_iters=100):
         #####################################
         #       START YOUR CODE HERE        #
         #####################################
-        pass
+        for i, point in enumerate(features):
+            distance = np.sqrt(np.sum((centers - point) ** 2, axis = 1))
+            assignments[i] = np.argmin(distance, axis = 0)
+        
+        for j in range(k):
+            centers[j] = np.mean(features[assignments == j],axis = 0)
         ######################################
         #        END OF YOUR CODE            #
         ######################################
@@ -80,7 +85,11 @@ def kmeans_fast(features, k, num_iters=100):
         #####################################
         #       START YOUR CODE HERE        #
         #####################################
-        pass
+        f_tmp = np.tile(features, (k, 1))
+        c_tmp = np.repeat(centers, N, axis=0)
+        assignments = np.argmin(np.sum((f_tmp - c_tmp)**2, axis=1).reshape(k, N), axis=0)
+        for j in range(k):
+            centers[j] = np.mean(features[assignments == j], axis=0)
         ######################################
         #        END OF YOUR CODE            #
         ######################################
@@ -105,7 +114,7 @@ def color_features(img):
     #####################################
     #       START YOUR CODE HERE        #
     #####################################
-    pass
+    features = img.reshape(H*W, C)
     ######################################
     #        END OF YOUR CODE            #
     ######################################
@@ -138,7 +147,12 @@ def color_position_features(img):
     #####################################
     #       START YOUR CODE HERE        #
     #####################################
-    pass
+    x = np.mgrid[:H,:W][0]
+    y = np.mgrid[:H,:W][1]
+    new_img=np.dstack((img,x,y))
+    imgMean = np.mean(new_img)
+    imgStd = np.std(new_img)
+    features = ((new_img-imgMean)/imgStd).reshape(H*W, C+2)
     ######################################
     #        END OF YOUR CODE            #
     ######################################
@@ -168,7 +182,10 @@ def compute_accuracy(mask_gt, mask):
     #####################################
     #       START YOUR CODE HERE        #
     #####################################
-    pass
+    PN = mask.shape[0]*mask.shape[1]
+    TP = len(np.nonzero(mask*mask_gt)[0])
+    TN = len(np.where((mask+mask_gt) == 0)[0])
+    accuracy = (TP+TN)/PN
     ######################################
     #        END OF YOUR CODE            #
     ######################################
